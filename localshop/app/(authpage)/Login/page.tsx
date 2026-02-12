@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-// import SignUpPage from '../SignUpPage/page'
+import SignUpPage from '../SignUpPage/page'
 // import { NavigationMenuDemo } from '@/component/ui/navigation-menu'
 // import Home from '@/app/Home/page'
 
@@ -80,7 +80,7 @@ const LoginPage = () => {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="*******"
+                placeholder="**********"
                 required
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition text-black"
               />
