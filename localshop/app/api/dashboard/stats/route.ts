@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(request: NextRequest) {
   try {
-    // Mock data - in production, this will come from the database
     const stats = {
       totalProducts: 150,
       totalCustomers: 45,
