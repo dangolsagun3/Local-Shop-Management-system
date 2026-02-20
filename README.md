@@ -190,6 +190,7 @@ README.md
 ## 1️⃣ Clone Repository
 
 git clone https://github.com/dangolsagun3/Local-Shop-Management-system.git\
+
 cd local-shop-management
 
 ## 2️⃣ Backend Setup
