@@ -1,0 +1,11 @@
+import mongoose from "mongoose";
+
+async function connect(){
+   const uri = process.env.MONGODB_URI || 'mongodb:';
+   const res = await mongoose.connect(uri);
+   if(res.connections) {
+      console.log('Connected to MongoDB successfully!');
+   }
+}
+
+export default connect;
