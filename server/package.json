@@ -1,22 +1,29 @@
 {
-  "name": "localshop-server",
+  "name": "server",
   "version": "1.0.0",
-  "description": "Backend server for Local Shop Management System",
+  "description": "Local Shop Management System Backend API",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js"
   },
+  "keywords": [
+    "shop-management",
+    "express",
+    "mongodb",
+    "pos"
+  ],
+  "author": "Sagun Dangol",
+  "license": "ISC",
   "dependencies": {
-    "express": "^5.2.1",
-    "mongoose": "^8.0.0",
-    "bcryptjs": "^2.4.3",
-    "jsonwebtoken": "^9.1.0",
-    "dotenv": "^16.3.1",
+    "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
-    "axios": "^1.6.0"
+    "dotenv": "^17.4.2",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^8.11.0"
   },
   "devDependencies": {
-    "nodemon": "^3.0.1"
+    "nodemon": "^3.1.14"
   }
 }

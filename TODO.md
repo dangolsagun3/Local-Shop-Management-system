@@ -3,9 +3,9 @@
 ## Task: Create user.routes for backend and should login after the sign up is correct
 
 ### Files to Create:
-- [] 1. server/models/User.js - Mongoose User model
-- [ ] 2. server/routes/user.js - User routes (signup, login)
-- [ ] 3. server/index.js - Main Express server entry point
+- [x] 1. server/models/User.js - Mongoose User model
+- [x] 2. server/routes/user.js - User routes (signup, login)
+- [x] 3. server/index.js - Main Express server entry point
 
 ### Implementation Details:
 1. **server/models/User.js**
