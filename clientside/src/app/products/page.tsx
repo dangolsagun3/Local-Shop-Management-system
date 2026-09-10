@@ -27,9 +27,8 @@ import { StockAdjustModal } from "../../components/StockAdjustModal";
 import { DeleteConfirmModal } from "../../components/DeleteConfirmModal";
 import { productService } from "../../services/productService";
 import { categoryService } from "../../services/categoryService";
-import { brandService } from "../../services/brandService";
 import { useSettings } from "../../context/SettingsContext";
-import { Product, Category, Brand } from "../../types";
+import { Product, Category } from "../../types";
 import toast from "react-hot-toast";
 
 export default function ProductsPage() {
@@ -37,13 +36,11 @@ export default function ProductsPage() {
 
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [brands, setBrands] = useState<Brand[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   // Filters & State
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
-  const [selectedBrand, setSelectedBrand] = useState("all");
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [onlyLowStock, setOnlyLowStock] = useState(false);
   const [viewMode, setViewMode] = useState<"table" | "grid">("table");
@@ -68,7 +65,6 @@ export default function ProductsPage() {
         limit: 20,
         search: search.trim() || undefined,
         category: selectedCategory !== "all" ? selectedCategory : undefined,
-        brand: selectedBrand !== "all" ? selectedBrand : undefined,
         status: selectedStatus !== "all" ? selectedStatus : undefined,
         low_stock: onlyLowStock ? "true" : undefined
       });
@@ -85,7 +81,7 @@ export default function ProductsPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [page, search, selectedCategory, selectedBrand, selectedStatus, onlyLowStock]);
+  }, [page, search, selectedCategory, selectedStatus, onlyLowStock]);
 
   useEffect(() => {
     fetchProducts();
@@ -94,10 +90,6 @@ export default function ProductsPage() {
   useEffect(() => {
     categoryService.getCategories().then((res) => {
       if (res.data) setCategories(res.data);
-    }).catch(console.error);
-
-    brandService.getBrands().then((res) => {
-      if (res.data) setBrands(res.data);
     }).catch(console.error);
   }, []);
 
@@ -220,22 +212,6 @@ export default function ProductsPage() {
                 </select>
               </div>
 
-              {/* Brand Filter */}
-              <div>
-                <select
-                  value={selectedBrand}
-                  onChange={(e) => setSelectedBrand(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                >
-                  <option value="all">All Brands</option>
-                  {brands.map((b) => (
-                    <option key={b._id} value={b._id}>
-                      {b.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
               {/* Status Filter */}
               <div>
                 <select
@@ -334,11 +310,6 @@ export default function ProductsPage() {
                                 <span className="font-bold text-white text-xs block truncate max-w-[180px]">
                                   {p.name}
                                 </span>
-                                {p.brand && (
-                                  <span className="text-[10px] text-slate-400">
-                                    {typeof p.brand === "object" ? p.brand?.name : p.brand}
-                                  </span>
-                                )}
                               </div>
                             </div>
                           </td>

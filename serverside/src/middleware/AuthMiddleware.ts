@@ -38,17 +38,14 @@ const Auth = (allowedRoles: Array<string> | null = null) => {
                 emailVerified: userDetail.emailVerify,
                 image: (userDetail.image as any) || null,
                 address: userDetail.address,
+                phone: userDetail.phone || null,
                 status: userDetail.status
             }
 
-            if(!
-                allowedRoles || 
-                userDetail.role === "admin" || 
-                allowedRoles.includes(userDetail.role))
-                {
+            if (!allowedRoles || allowedRoles.includes(userDetail.role)) {
                 next()
             } else {
-                throw {code: 403, message: "permission Denied"}
+                throw { code: 403, message: `Permission Denied: Accounts with role '${userDetail.role}' are not permitted to perform this action.` }
             }
 
         } catch (exception) {

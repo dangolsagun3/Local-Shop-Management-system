@@ -38,10 +38,6 @@ class ProductController {
             if (!data.category || data.category === "null" || data.category === "") {
                 data.category = null;
             }
-            if (!data.brand || data.brand === "null" || data.brand === "") {
-                data.brand = null;
-            }
-
             // Auto-calculate status
             if (Number(data.stock) <= 0) {
                 data.status = "out_of_stock";
@@ -56,8 +52,7 @@ class ProductController {
             await product.save();
 
             const populatedProduct = await ProductModel.findById(product._id)
-                .populate("category", ["_id", "name", "slug"])
-                .populate("brand", ["_id", "name", "slug"]);
+                .populate("category", ["_id", "name", "slug"]);
 
             res.status(201).json({
                 data: populatedProduct,
@@ -96,13 +91,6 @@ class ProductController {
                 }
             }
 
-            // Brand filter
-            if (req.query.brand && req.query.brand !== "all") {
-                if (mongoose.Types.ObjectId.isValid(String(req.query.brand))) {
-                    filter.brand = new mongoose.Types.ObjectId(String(req.query.brand));
-                }
-            }
-
             // Status filter
             if (req.query.status && req.query.status !== "all") {
                 filter.status = req.query.status;
@@ -123,7 +111,6 @@ class ProductController {
 
             const products = await ProductModel.find(filter)
                 .populate("category", ["_id", "name", "slug"])
-                .populate("brand", ["_id", "name", "slug"])
                 .sort(sort)
                 .skip(skip)
                 .limit(limit);
@@ -160,7 +147,6 @@ class ProductController {
 
             const product = await ProductModel.findOne(query)
                 .populate("category", ["_id", "name", "slug"])
-                .populate("brand", ["_id", "name", "slug"])
                 .populate("createdBy", ["_id", "name", "email"])
                 .populate("updatedBy", ["_id", "name", "email"]);
 
@@ -206,10 +192,6 @@ class ProductController {
             if (payload.category === "null" || payload.category === "") {
                 payload.category = null;
             }
-            if (payload.brand === "null" || payload.brand === "") {
-                payload.brand = null;
-            }
-
             if (payload.stock !== undefined) {
                 if (Number(payload.stock) <= 0) {
                     payload.status = "out_of_stock";
@@ -225,8 +207,7 @@ class ProductController {
                 payload,
                 { new: true }
             )
-                .populate("category", ["_id", "name", "slug"])
-                .populate("brand", ["_id", "name", "slug"]);
+                .populate("category", ["_id", "name", "slug"]);
 
             res.json({
                 data: updatedProduct,

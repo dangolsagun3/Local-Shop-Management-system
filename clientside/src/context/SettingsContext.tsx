@@ -17,10 +17,10 @@ const defaultSettings: ShopSettings = {
   shopName: process.env.NEXT_PUBLIC_SHOP_NAME || "ShopX Local Supermarket",
   currency: process.env.NEXT_PUBLIC_SHOP_CURRENCY || "Rs.",
   taxPercent: Number(process.env.NEXT_PUBLIC_SHOP_TAX_PERCENT || 13),
-  shopPhone: "+977 9801234567",
-  shopEmail: "contact@shopxmart.com",
-  shopAddress: "Main Street, Market Square, Kathmandu",
-  vatNumber: "PAN/VAT: 601294812",
+  shopPhone: "+977 9749357835",
+  shopEmail: "shopX@gmail.com",
+  shopAddress: "Tokha-2, Kathmandu",
+  vatNumber: "PAN/VAT: 153766509",
   receiptFooter: "Thank you for shopping with us! Please come again."
 };
 

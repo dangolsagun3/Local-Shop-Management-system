@@ -55,13 +55,22 @@ export default function LandingPage() {
           </Link>
 
           <div className="flex items-center gap-3">
+            {/* Link navbar to POS Terminal */}
+            <Link
+              href="/pos"
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-teal-600/20 hover:bg-teal-600/30 text-teal-300 border border-teal-500/40 hover:border-teal-400 shadow-sm transition"
+            >
+              <ShoppingCart className="w-4 h-4 text-emerald-400" />
+              <span>POS Terminal</span>
+            </Link>
+
             {user ? (
               <div className="flex items-center gap-3">
                 <Link
-                  href="/dashboard"
+                  href={user.role === "customer" ? "/pos" : "/dashboard"}
                   className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white shadow-md shadow-emerald-950/50 transition"
                 >
-                  <span>Go to Dashboard</span>
+                  <span>{user.role === "customer" ? "Shop in POS" : "Go to Dashboard"}</span>
                   <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>

@@ -10,14 +10,10 @@ import {
   Boxes,
   Receipt,
   Tags,
-  Bookmark,
-  Users,
-  Settings,
   LogOut,
   Store,
   ChevronLeft,
   ChevronRight,
-  Sparkles,
   ShieldCheck,
   AlertTriangle
 } from "lucide-react";
@@ -28,7 +24,7 @@ interface NavItem {
   name: string;
   href: string;
   icon: React.ComponentType<{ className?: string }>;
-  roles?: Array<'admin' | 'seller' | 'customer'>;
+  roles?: Array<'admin' | 'seller' | 'customer' | 'cashier' | 'manager'>;
   badge?: string | number;
 }
 
@@ -49,10 +45,7 @@ export const Sidebar: React.FC<{ lowStockCount?: number }> = ({ lowStockCount = 
     },
     { name: "Inventory", href: "/inventory", icon: Boxes },
     { name: "Sales & Invoices", href: "/sales", icon: Receipt },
-    { name: "Categories", href: "/categories", icon: Tags },
-    { name: "Brands", href: "/brands", icon: Bookmark },
-    { name: "Customers / Khata", href: "/customers", icon: Users },
-    { name: "Settings", href: "/settings", icon: Settings, roles: ['admin'] }
+    { name: "Categories", href: "/categories", icon: Tags }
   ];
 
   const filteredNav = navItems.filter((item) => {

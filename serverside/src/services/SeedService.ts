@@ -1,5 +1,4 @@
 import CategoryModel from "../module/category/CategoryModel";
-import BrandModel from "../module/brand/BrandModel";
 import ProductModel from "../module/product/ProductModel";
 import UserModel from "../module/user/UserModel";
 import bcrypt from "bcryptjs";
@@ -32,6 +31,23 @@ export async function seedDatabaseIfEmpty() {
             console.log("Created default Admin: admin@shopx.com / admin123");
         }
 
+        // Ensure default customer user
+        let customerUser = await UserModel.findOne({ role: "customer" });
+        if (!customerUser) {
+            customerUser = new UserModel({
+                name: "ShopX Customer",
+                email: "customer@shopx.com",
+                password: bcrypt.hashSync("customer123", 12),
+                role: "customer",
+                status: "active",
+                emailVerify: true,
+                phone: "+977 9811111111",
+                address: "Kathmandu, Nepal"
+            });
+            await customerUser.save();
+            console.log("Created default Customer: customer@shopx.com / customer123");
+        }
+
         // Seed Categories
         const categoriesData = [
             { name: "Beverages & Drinks", summary: "Cold drinks, juices, coffee and tea", status: "active" },
@@ -58,39 +74,11 @@ export async function seedDatabaseIfEmpty() {
             categoryMap.set(cat.name, existing._id);
         }
 
-        // Seed Brands
-        const brandsData = [
-            { name: "Coca-Cola", summary: "Global beverage corporation", status: "active" },
-            { name: "Nestlé", summary: "Food and drink processing", status: "active" },
-            { name: "Unilever", summary: "Consumer goods company", status: "active" },
-            { name: "PepsiCo", summary: "Beverages and snack food", status: "active" },
-            { name: "Amul", summary: "Dairy cooperative", status: "active" },
-            { name: "Britannia", summary: "Bakery and dairy foods", status: "active" },
-            { name: "P&G", summary: "Procter & Gamble personal health and hygiene", status: "active" },
-            { name: "Local Harvest", summary: "Farm fresh organic produce", status: "active" }
-        ];
-
-        const brandMap = new Map();
-        for (const b of brandsData) {
-            const slug = slugify(b.name, { lower: true, strict: true });
-            let existing = await BrandModel.findOne({ slug });
-            if (!existing) {
-                existing = new BrandModel({
-                    ...b,
-                    slug,
-                    createdBy: adminUser._id
-                });
-                await existing.save();
-            }
-            brandMap.set(b.name, existing._id);
-        }
-
         // Seed Products
         const productsData = [
             {
                 name: "Coca-Cola Original Taste 500ml",
                 category: categoryMap.get("Beverages & Drinks"),
-                brand: brandMap.get("Coca-Cola"),
                 costPrice: 50,
                 price: 65,
                 discount: 0,
@@ -106,7 +94,6 @@ export async function seedDatabaseIfEmpty() {
             {
                 name: "Lay's Classic Salted Potato Chips 50g",
                 category: categoryMap.get("Snacks & Munchies"),
-                brand: brandMap.get("PepsiCo"),
                 costPrice: 28,
                 price: 40,
                 discount: 0,
@@ -122,7 +109,6 @@ export async function seedDatabaseIfEmpty() {
             {
                 name: "Amul Pure Butter 500g",
                 category: categoryMap.get("Dairy, Bread & Eggs"),
-                brand: brandMap.get("Amul"),
                 costPrice: 240,
                 price: 290,
                 discount: 10,
@@ -138,7 +124,6 @@ export async function seedDatabaseIfEmpty() {
             {
                 name: "Nescafé Classic Instant Coffee Jar 100g",
                 category: categoryMap.get("Beverages & Drinks"),
-                brand: brandMap.get("Nestlé"),
                 costPrice: 320,
                 price: 390,
                 discount: 15,
@@ -154,7 +139,6 @@ export async function seedDatabaseIfEmpty() {
             {
                 name: "Basmati Premium Long Grain Rice 5kg",
                 category: categoryMap.get("Groceries & Staples"),
-                brand: brandMap.get("Local Harvest"),
                 costPrice: 650,
                 price: 780,
                 discount: 30,
@@ -170,7 +154,6 @@ export async function seedDatabaseIfEmpty() {
             {
                 name: "Britannia Good Day Butter Cookies 200g",
                 category: categoryMap.get("Snacks & Munchies"),
-                brand: brandMap.get("Britannia"),
                 costPrice: 35,
                 price: 50,
                 discount: 0,
@@ -186,7 +169,6 @@ export async function seedDatabaseIfEmpty() {
             {
                 name: "Dove Deep Moisture Body Wash 250ml",
                 category: categoryMap.get("Personal Care & Hygiene"),
-                brand: brandMap.get("Unilever"),
                 costPrice: 220,
                 price: 280,
                 discount: 0,
@@ -202,7 +184,6 @@ export async function seedDatabaseIfEmpty() {
             {
                 name: "Sunlight Dishwashing Liquid Lemon 500ml",
                 category: categoryMap.get("Household & Cleaning"),
-                brand: brandMap.get("Unilever"),
                 costPrice: 110,
                 price: 150,
                 discount: 10,
@@ -218,7 +199,6 @@ export async function seedDatabaseIfEmpty() {
             {
                 name: "KitKat 4-Finger Milk Chocolate 41.5g",
                 category: categoryMap.get("Confectionery & Sweets"),
-                brand: brandMap.get("Nestlé"),
                 costPrice: 40,
                 price: 60,
                 discount: 0,
@@ -234,7 +214,6 @@ export async function seedDatabaseIfEmpty() {
             {
                 name: "Fresh Whole Milk 1 Litre",
                 category: categoryMap.get("Dairy, Bread & Eggs"),
-                brand: brandMap.get("Local Harvest"),
                 costPrice: 75,
                 price: 95,
                 discount: 0,
@@ -261,7 +240,7 @@ export async function seedDatabaseIfEmpty() {
             await product.save();
         }
 
-        console.log(`Successfully seeded ${productsData.length} products with categories & brands!`);
+        console.log(`Successfully seeded ${productsData.length} products with categories!`);
     } catch (err) {
         console.error("Error seeding initial data:", err);
     }

@@ -8,7 +8,7 @@ export interface RegisterPayload {
   confirmPassword?: string;
   phone?: string;
   address?: string;
-  role?: 'admin' | 'seller' | 'customer';
+  role?: 'admin' | 'seller' | 'customer' | 'cashier' | 'manager';
 }
 
 export interface LoginPayload {

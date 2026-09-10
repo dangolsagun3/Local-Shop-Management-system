@@ -16,10 +16,9 @@ import {
   HelpCircle,
   Percent
 } from "lucide-react";
-import { Product, Category, Brand } from "../types";
+import { Product, Category } from "../types";
 import { productService } from "../services/productService";
 import { categoryService } from "../services/categoryService";
-import { brandService } from "../services/brandService";
 import { useSettings } from "../context/SettingsContext";
 import toast from "react-hot-toast";
 
@@ -38,7 +37,6 @@ export const ProductModal: React.FC<ProductModalProps> = ({
 }) => {
   const { settings, formatPrice } = useSettings();
   const [categories, setCategories] = useState<Category[]>([]);
-  const [brands, setBrands] = useState<Brand[]>([]);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   // Form State
@@ -46,7 +44,6 @@ export const ProductModal: React.FC<ProductModalProps> = ({
   const [sku, setSku] = useState("");
   const [barcode, setBarcode] = useState("");
   const [category, setCategory] = useState("");
-  const [brand, setBrand] = useState("");
   const [costPrice, setCostPrice] = useState<number | string>(0);
   const [price, setPrice] = useState<number | string>(0);
   const [discount, setDiscount] = useState<number | string>(0);
@@ -66,10 +63,6 @@ export const ProductModal: React.FC<ProductModalProps> = ({
       categoryService.getCategories().then((res) => {
         if (res.data) setCategories(res.data);
       }).catch(console.error);
-
-      brandService.getBrands().then((res) => {
-        if (res.data) setBrands(res.data);
-      }).catch(console.error);
     }
   }, [isOpen]);
 
@@ -84,13 +77,6 @@ export const ProductModal: React.FC<ProductModalProps> = ({
           ? productToEdit.category._id
           : typeof productToEdit.category === "string"
           ? productToEdit.category
-          : ""
-      );
-      setBrand(
-        typeof productToEdit.brand === "object" && productToEdit.brand?._id
-          ? productToEdit.brand._id
-          : typeof productToEdit.brand === "string"
-          ? productToEdit.brand
           : ""
       );
       setCostPrice(productToEdit.costPrice || 0);
@@ -111,7 +97,6 @@ export const ProductModal: React.FC<ProductModalProps> = ({
       setSku(`SKU-${Date.now().toString().slice(-6)}`);
       setBarcode(`890${Math.floor(Math.random() * 900000000 + 100000000)}`);
       setCategory("");
-      setBrand("");
       setCostPrice(0);
       setPrice(0);
       setDiscount(0);
@@ -173,7 +158,6 @@ export const ProductModal: React.FC<ProductModalProps> = ({
         payload.append("sku", sku.trim());
         if (barcode.trim()) payload.append("barcode", barcode.trim());
         if (category) payload.append("category", category);
-        if (brand) payload.append("brand", brand);
         payload.append("costPrice", String(costPrice));
         payload.append("price", String(price));
         payload.append("discount", String(discount));
@@ -190,7 +174,6 @@ export const ProductModal: React.FC<ProductModalProps> = ({
           sku: sku.trim(),
           barcode: barcode.trim() || undefined,
           category: category || null,
-          brand: brand || null,
           costPrice: Number(costPrice) || 0,
           price: Number(price) || 0,
           discount: Number(discount) || 0,
@@ -288,24 +271,6 @@ export const ProductModal: React.FC<ProductModalProps> = ({
                   {categories.map((c) => (
                     <option key={c._id} value={c._id}>
                       {c.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                  Brand / Manufacturer
-                </label>
-                <select
-                  value={brand}
-                  onChange={(e) => setBrand(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                >
-                  <option value="">Select Brand (Optional)</option>
-                  {brands.map((b) => (
-                    <option key={b._id} value={b._id}>
-                      {b.name}
                     </option>
                   ))}
                 </select>

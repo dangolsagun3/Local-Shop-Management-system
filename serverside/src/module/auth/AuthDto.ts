@@ -11,7 +11,7 @@ export const UserRegisterDTO = z.object({
     confirmPassword: z.string().optional().nullable(),
     phone: z.string().optional().nullable(),
     contact: z.string().optional().nullable(),
-    role: z.enum(['customer', 'seller', 'admin']).optional().default("customer"),
+    role: z.enum(['customer', 'seller', 'cashier', 'manager', 'admin']).optional().default("customer"),
     address: z.string().nullable().optional()
 }).refine((val) => {
     return !!(val.name || val.fullName);

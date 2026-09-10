@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   Menu,
   Bell,
@@ -31,6 +32,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const { user } = useAuth();
   const { settings } = useSettings();
+  const pathname = usePathname();
   const [currentTime, setCurrentTime] = useState<string>("");
   const [isSeeding, setIsSeeding] = useState<boolean>(false);
 
@@ -83,8 +85,6 @@ export const Navbar: React.FC<NavbarProps> = ({
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-950/60 border border-emerald-800/50 text-emerald-400 text-xs font-medium">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="hidden sm:inline">MongoDB Atlas Live</span>
-            <span className="sm:hidden">DB Online</span>
           </div>
           <span className="text-xs text-slate-400 hidden md:inline-block">
             • {currentTime}
@@ -116,32 +116,50 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
         )}
 
-        {/* Quick POS Terminal button */}
+        {/* Link Navbar to POS Terminal */}
         <Link
           href="/pos"
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-teal-600/20 hover:bg-teal-600/30 text-teal-300 border border-teal-500/30 transition"
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition shadow-sm ${
+            pathname === "/pos"
+              ? "bg-emerald-500 text-slate-950 font-extrabold ring-2 ring-emerald-400/50 shadow-emerald-500/20"
+              : "bg-teal-600/20 hover:bg-teal-600/30 text-teal-300 border border-teal-500/40 hover:border-teal-400"
+          }`}
+          title="Open Point of Sale Terminal"
         >
           <ShoppingCart className="w-4 h-4" />
-          <span className="hidden sm:inline">POS Checkout</span>
+          <span>POS Terminal</span>
+          {pathname === "/pos" && (
+            <span className="w-1.5 h-1.5 rounded-full bg-slate-950 animate-pulse ml-0.5" />
+          )}
         </Link>
 
         {/* User Pill */}
         {user ? (
           <div className="flex items-center gap-2 pl-2 border-l border-slate-800">
-            <div className="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xs font-bold text-emerald-400">
+            <div className={`w-8 h-8 rounded-full border flex items-center justify-center text-xs font-bold ${
+              user.role === 'customer' 
+                ? 'bg-emerald-950/80 border-emerald-500 text-emerald-400'
+                : user.role === 'admin'
+                ? 'bg-rose-950/80 border-rose-500 text-rose-400'
+                : 'bg-amber-950/80 border-amber-500 text-amber-400'
+            }`}>
               {user.name.charAt(0).toUpperCase()}
             </div>
             <div className="hidden xl:flex flex-col text-left">
               <span className="text-xs font-medium text-white truncate max-w-[100px]">
                 {user.name}
               </span>
-              <span className="text-[10px] text-slate-400 capitalize">{user.role}</span>
+              <span className={`text-[10px] font-semibold capitalize ${
+                user.role === 'customer' ? 'text-emerald-400' : 'text-amber-400'
+              }`}>
+                {user.role}
+              </span>
             </div>
           </div>
         ) : (
           <Link
             href="/login"
-            className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-white hover:bg-slate-700"
+            className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-white hover:bg-slate-700 border border-slate-700"
           >
             Sign In
           </Link>

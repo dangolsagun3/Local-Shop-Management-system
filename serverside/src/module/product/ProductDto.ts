@@ -7,7 +7,6 @@ export const ProductCreateDTO = z.object({
     barcode: z.string().optional().nullable(),
     description: z.string().optional().nullable(),
     category: z.string().optional().nullable(),
-    brand: z.string().optional().nullable(),
     costPrice: z.preprocess((val) => Number(val ?? 0), z.number().min(0)).optional().default(0),
     price: z.preprocess((val) => Number(val), z.number().min(0, "Price must be >= 0")),
     discount: z.preprocess((val) => Number(val ?? 0), z.number().min(0)).optional().default(0),

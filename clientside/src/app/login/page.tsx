@@ -38,7 +38,14 @@ export default function LoginPage() {
         password
       });
       toast.success("Welcome back to ShopX!");
-      router.push("/dashboard");
+      
+      const savedUserStr = localStorage.getItem("shopx_user");
+      const savedUser = savedUserStr ? JSON.parse(savedUserStr) : null;
+      if (savedUser?.role === "customer") {
+        router.push("/pos");
+      } else {
+        router.push("/dashboard");
+      }
     } catch (err: any) {
       toast.error(err.message || "Invalid credentials");
     } finally {
@@ -127,33 +134,42 @@ export default function LoginPage() {
           </button>
         </form>
 
-        {/* Demo Fast Login Pills */}
-        <div className="mt-6 pt-5 border-t border-slate-800 text-center">
-          <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2.5">
-            Quick Demo Accounts:
-          </p>
+        {/* Quick Demo Credentials */}
+        <div className="mt-6 pt-4 border-t border-slate-800 space-y-3">
+          <div className="flex items-center justify-between text-[11px] text-slate-400">
+            <span>Quick Test Accounts:</span>
+            <span className="text-[10px] text-emerald-400 font-semibold">Click to autofill</span>
+          </div>
+
           <div className="grid grid-cols-2 gap-2">
             <button
               type="button"
-              onClick={() => handleDemoFill("admin@shopx.com", "admin123")}
-              className="p-2 rounded-xl bg-slate-800/80 hover:bg-slate-750 border border-slate-700 text-[11px] font-medium text-slate-300 hover:text-emerald-400 transition text-left"
+              onClick={() => handleDemoFill("customer@shopx.com", "customer123")}
+              className="p-2.5 rounded-xl bg-emerald-950/40 border border-emerald-800/50 hover:bg-emerald-900/50 text-left transition"
             >
-              <span className="font-bold text-emerald-400 block">Admin / Owner</span>
-              <span className="text-[10px] text-slate-500">admin@shopx.com</span>
+              <span className="text-xs font-bold text-emerald-300 block">Customer</span>
+              <span className="text-[10px] text-slate-400 block">customer@shopx.com</span>
+              <span className="text-[9px] text-emerald-400 font-semibold block mt-0.5">✓ Allowed to Buy</span>
             </button>
+
             <button
               type="button"
-              onClick={() => handleDemoFill("testshopx@example.com", "password123")}
-              className="p-2 rounded-xl bg-slate-800/80 hover:bg-slate-750 border border-slate-700 text-[11px] font-medium text-slate-300 hover:text-teal-400 transition text-left"
+              onClick={() => handleDemoFill("admin@shopx.com", "admin123")}
+              className="p-2.5 rounded-xl bg-rose-950/40 border border-rose-800/50 hover:bg-rose-900/50 text-left transition"
             >
-              <span className="font-bold text-teal-400 block">Cashier / Staff</span>
-              <span className="text-[10px] text-slate-500">testshopx@...</span>
+              <span className="text-xs font-bold text-rose-300 block">Admin (Staff)</span>
+              <span className="text-[10px] text-slate-400 block">admin@shopx.com</span>
+              <span className="text-[9px] text-rose-400 font-semibold block mt-0.5">✕ Cannot Buy in POS</span>
             </button>
+          </div>
+
+          <div className="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 text-[11px] text-slate-400 leading-relaxed">
+            <span className="text-slate-300 font-semibold">POS Rule:</span> Admin, Cashier, and Manager accounts are staff and cannot buy products in POS terminal. Only customers can make purchases.
           </div>
         </div>
 
         {/* Footer link to register */}
-        <p className="text-center text-xs text-slate-400 mt-6">
+        <p className="text-center text-xs text-slate-400 mt-4">
           Don't have an account?{" "}
           <Link
             href="/register"

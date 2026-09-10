@@ -7,6 +7,18 @@ import mongoose from "mongoose";
 class SaleController {
     createSale = async (req: IAuthRequest, res: Response, next: NextFunction) => {
         try {
+            if (!req.loggedInUser) {
+                throw { code: 401, message: "Authentication required: Please sign in as a customer to purchase products from the POS terminal." };
+            }
+
+            // Strictly enforce: Only customer can buy from POS terminal. Admin, cashier, manager cannot buy.
+            if (req.loggedInUser.role !== "customer") {
+                throw {
+                    code: 403,
+                    message: `Buying restricted: Users with role '${req.loggedInUser.role}' (Admin, Cashier, Manager) are not allowed to purchase products in the POS terminal. Only customers can buy.`
+                };
+            }
+
             const {
                 customer,
                 items,
@@ -79,10 +91,10 @@ class SaleController {
             const sale = new SaleModel({
                 invoiceNumber,
                 customer: {
-                    name: customer?.name || "Walk-in Customer",
-                    phone: customer?.phone || "",
-                    email: customer?.email || "",
-                    address: customer?.address || ""
+                    name: customer?.name || req.loggedInUser?.name || "Customer",
+                    phone: customer?.phone || req.loggedInUser?.phone || "",
+                    email: customer?.email || req.loggedInUser?.email || "",
+                    address: customer?.address || req.loggedInUser?.address || ""
                 },
                 items: processedItems,
                 subtotal: calcSubtotal,
@@ -97,7 +109,7 @@ class SaleController {
                 orderStatus: "completed",
                 notes: notes || "",
                 cashier: req.loggedInUser?._id ? new mongoose.Types.ObjectId(req.loggedInUser._id) : null,
-                cashierName: req.loggedInUser?.name || "Cashier"
+                cashierName: req.loggedInUser?.name || "Customer"
             });
 
             await sale.save();

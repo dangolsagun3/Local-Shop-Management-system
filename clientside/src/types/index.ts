@@ -2,7 +2,7 @@ export interface User {
   _id: string;
   name: string;
   email: string;
-  role: 'admin' | 'seller' | 'customer';
+  role: 'admin' | 'seller' | 'customer' | 'cashier' | 'manager';
   status: 'active' | 'inactive';
   phone?: string;
   address?: string;
@@ -22,16 +22,6 @@ export interface Category {
   createdAt?: string;
 }
 
-export interface Brand {
-  _id: string;
-  name: string;
-  slug: string;
-  summary?: string;
-  image?: { url: string; path: string } | null;
-  status: 'active' | 'inactive';
-  createdAt?: string;
-}
-
 export interface Product {
   _id: string;
   name: string;
@@ -40,7 +30,6 @@ export interface Product {
   barcode?: string;
   description?: string;
   category?: Category | { _id: string; name: string; slug: string } | null;
-  brand?: Brand | { _id: string; name: string; slug: string } | null;
   costPrice: number;
   price: number;
   discount: number;

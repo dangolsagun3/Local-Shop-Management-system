@@ -155,7 +155,7 @@ interface NewComponentProps {
 export default function NewComponent({ title, children }: NewComponentProps) {
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-xl font-bold text-gray-900 mb-4">{title}</h2>
+      <h2 cadmin123lassName="text-xl font-bold text-gray-900 mb-4">{title}</h2>
       {children}
     </div>
   )

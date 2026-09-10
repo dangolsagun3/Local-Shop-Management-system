@@ -8,6 +8,7 @@ export interface IUserDetail {
     emailVerified?: boolean,
     image?: {url: string, path: string} | null | string,
     address?: string | null,
+    phone?: string | null,
     status: string
 }
 

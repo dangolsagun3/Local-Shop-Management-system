@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
+import { Navbar } from "../../components/Navbar";
 import {
   ShoppingCart,
   Search,
@@ -23,11 +24,15 @@ import {
   CheckCircle2,
   RefreshCw,
   User,
-  AlertCircle
+  AlertCircle,
+  ShieldAlert,
+  Lock,
+  ShieldCheck
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useSettings } from "../../context/SettingsContext";
 import { useCart } from "../../context/CartContext";
+import { Sidebar } from "../../components/Sidebar";
 import { productService } from "../../services/productService";
 import { categoryService } from "../../services/categoryService";
 import { posService } from "../../services/posService";
@@ -39,6 +44,9 @@ import toast from "react-hot-toast";
 export default function POSPage() {
   const { user } = useAuth();
   const { settings, formatPrice } = useSettings();
+
+  const isCustomer = user?.role === "customer";
+  const isStaff = !!user && (user.role === "admin" || user.role === "seller" || user.role === "cashier" || user.role === "manager");
   const {
     items,
     customer,
@@ -96,6 +104,19 @@ export default function POSPage() {
     fetchCatalog();
   }, []);
 
+  // Auto-sync customer details when logged-in as customer
+  useEffect(() => {
+    if (user && user.role === "customer") {
+      setCustomer((prev) => ({
+        ...prev,
+        name: user.name || prev.name,
+        email: user.email || prev.email,
+        phone: user.phone || prev.phone,
+        address: user.address || prev.address
+      }));
+    }
+  }, [user, setCustomer]);
+
   // Filtered products
   const filteredProducts = useMemo(() => {
     return products.filter((p) => {
@@ -120,6 +141,22 @@ export default function POSPage() {
 
   // Handle Barcode Scan
   const handleBarcodeScan = (code: string) => {
+    // Only customer can buy from POS terminal; admin, seller, cashier, manager cannot buy
+    if (isStaff) {
+      toast.error(`Staff restriction: ${user?.role.toUpperCase()} accounts cannot buy products. Only customers can buy from the POS terminal.`, {
+        icon: "🚫",
+        duration: 4000
+      });
+      return;
+    }
+    if (!user) {
+      toast.error("Please sign in as a Customer to purchase products.", {
+        icon: "🔒",
+        duration: 4000
+      });
+      return;
+    }
+
     const found = products.find(
       (p) =>
         p.barcode === code ||
@@ -143,6 +180,31 @@ export default function POSPage() {
     }
   };
 
+  // Handle adding product with role check
+  const handleAddToCart = (product: Product) => {
+    if (isStaff) {
+      toast.error(`Buying restricted: ${user?.role.toUpperCase()} accounts cannot buy products. Only customers can buy from the POS terminal.`, {
+        icon: "🚫",
+        duration: 4000
+      });
+      return;
+    }
+    if (!user) {
+      toast.error("Please sign in as a Customer to buy products.", {
+        icon: "🔒",
+        duration: 4000
+      });
+      return;
+    }
+
+    const added = addItem(product, 1);
+    if (!added) {
+      toast.error(`Cannot add more than available stock (${product.stock})`);
+    } else {
+      toast.success(`Added ${product.name} to cart`);
+    }
+  };
+
   // Quick cash helpers
   const handleQuickCash = (amount: number) => {
     setPaidAmount(amount);
@@ -150,6 +212,16 @@ export default function POSPage() {
 
   // Checkout process
   const handleCheckout = async () => {
+    // Strict verification: only customer can buy from POS terminal
+    if (!user) {
+      toast.error("Please sign in as a Customer to buy products.");
+      return;
+    }
+    if (user.role !== "customer") {
+      toast.error(`Access Denied: Only customers can buy from the POS terminal. ${user.role.toUpperCase()} accounts (Admin, Cashier, Manager) cannot make purchases.`);
+      return;
+    }
+
     if (items.length === 0) {
       toast.error("Cart is empty! Add products to proceed.");
       return;
@@ -197,7 +269,54 @@ export default function POSPage() {
 
   return (
     <div className="h-screen bg-slate-950 text-slate-100 flex flex-col overflow-hidden">
-      {/* Top POS Header */}
+      <div className="flex flex-1 min-h-0">
+        <Sidebar />
+        <div className="flex-1 min-w-0 flex flex-col overflow-hidden">
+      {/* Top POS Navbar (Linked to POS Terminal) */}
+      <Navbar />
+
+      {/* Role-based Buying Permission Banner */}
+      {isStaff ? (
+        <div className="bg-rose-950/90 border-b border-rose-800/80 px-4 py-2 flex items-center justify-between gap-3 text-xs text-rose-200 z-10 flex-shrink-0">
+          <div className="flex items-center gap-2.5">
+            <ShieldAlert className="w-4 h-4 text-rose-400 flex-shrink-0 animate-pulse" />
+            <span>
+              <strong>Staff Buying Restriction ({user?.role.toUpperCase()}):</strong> You are logged in as <strong>{user?.name}</strong>. Admin, Cashier, and Manager accounts are not allowed to buy any product in the POS terminal. Only customers can buy products.
+            </span>
+          </div>
+          <Link
+            href="/login"
+            className="px-2.5 py-1 rounded-lg text-xs font-bold bg-rose-900 hover:bg-rose-800 border border-rose-700 text-white whitespace-nowrap transition"
+          >
+            Switch to Customer
+          </Link>
+        </div>
+      ) : !user ? (
+        <div className="bg-sky-950/90 border-b border-sky-800/80 px-4 py-2 flex items-center justify-between gap-3 text-xs text-sky-200 z-10 flex-shrink-0">
+          <div className="flex items-center gap-2.5">
+            <Lock className="w-4 h-4 text-sky-400 flex-shrink-0" />
+            <span>
+              <strong>Customer Login Required:</strong> Only customer accounts are permitted to buy products from the POS terminal. Admin, cashier, and manager accounts cannot make purchases.
+            </span>
+          </div>
+          <Link
+            href="/login"
+            className="px-2.5 py-1 rounded-lg text-xs font-bold bg-sky-600 hover:bg-sky-500 text-white whitespace-nowrap transition shadow-sm"
+          >
+            Sign In as Customer
+          </Link>
+        </div>
+      ) : (
+        <div className="bg-emerald-950/60 border-b border-emerald-800/40 px-4 py-1.5 flex items-center justify-between text-xs text-emerald-300 z-10 flex-shrink-0">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+            <span>
+              Customer Access: Logged in as <strong>{user.name}</strong> ({user.email}) — You are authorized to purchase products from this POS terminal.
+            </span>
+          </div>
+        </div>
+      )}
+      
       <header className="h-14 bg-slate-900 border-b border-slate-800 px-4 flex items-center justify-between gap-4 flex-shrink-0 z-20">
         <div className="flex items-center gap-3">
           <Link
@@ -306,12 +425,7 @@ export default function POSPage() {
                 <button
                   key={p._id}
                   disabled={isOutOfStock}
-                  onClick={() => {
-                    const added = addItem(p, 1);
-                    if (!added) {
-                      toast.error(`Cannot add more than available stock (${p.stock})`);
-                    }
-                  }}
+                  onClick={() => handleAddToCart(p)}
                   className={`flex flex-col text-left p-2.5 rounded-2xl border transition-all duration-150 relative group ${
                     isOutOfStock
                       ? "bg-slate-900/40 border-slate-800/50 opacity-60 cursor-not-allowed"
@@ -418,24 +532,68 @@ export default function POSPage() {
             </div>
           </div>
 
-          {/* Customer Input (Walk-in / Custom) */}
-          <div className="px-3.5 py-2 border-b border-slate-800 bg-slate-900/60 flex items-center gap-2">
-            <User className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
-            <input
-              type="text"
-              placeholder="Customer Name (e.g. Regular Buyer)"
-              value={customer.name}
-              onChange={(e) => setCustomer({ ...customer, name: e.target.value })}
-              className="w-1/2 px-2 py-1 rounded bg-slate-800 border border-slate-700 text-white text-[11px] focus:outline-none focus:ring-1 focus:ring-emerald-500"
-            />
-            <input
-              type="tel"
-              placeholder="Phone (Optional)"
-              value={customer.phone}
-              onChange={(e) => setCustomer({ ...customer, phone: e.target.value })}
-              className="w-1/2 px-2 py-1 rounded bg-slate-800 border border-slate-700 text-white text-[11px] focus:outline-none focus:ring-1 focus:ring-emerald-500"
-            />
-          </div>
+          {/* Staff or Login Warning in Cart Panel */}
+          {isStaff ? (
+            <div className="mx-3.5 my-2 p-3 rounded-xl bg-rose-950/70 border border-rose-800/60 text-xs text-rose-200">
+              <div className="flex items-center gap-1.5 font-bold text-rose-300 mb-1">
+                <ShieldAlert className="w-4 h-4 text-rose-400 flex-shrink-0" />
+                <span>Buying Blocked for {user?.role.toUpperCase()}</span>
+              </div>
+              <p className="text-[11px] text-rose-200/80 leading-relaxed">
+                Admin, Cashier, and Manager roles are not permitted to buy products. Only customers can buy from the POS terminal.
+              </p>
+            </div>
+          ) : !user ? (
+            <div className="mx-3.5 my-2 p-3 rounded-xl bg-sky-950/70 border border-sky-800/60 text-xs text-sky-200">
+              <div className="flex items-center gap-1.5 font-bold text-sky-300 mb-1">
+                <Lock className="w-4 h-4 text-sky-400 flex-shrink-0" />
+                <span>Customer Sign-In Required</span>
+              </div>
+              <p className="text-[11px] text-sky-200/80 leading-relaxed">
+                Only customer accounts can purchase items from this POS terminal. Please sign in as a customer.
+              </p>
+            </div>
+          ) : null}
+
+          {/* Customer Details */}
+          {isCustomer ? (
+            <div className="px-3.5 py-2.5 border-b border-slate-800 bg-slate-900/60 flex items-center justify-between text-xs">
+              <div className="flex items-center gap-2 overflow-hidden">
+                <div className="w-6 h-6 rounded-full bg-emerald-950 border border-emerald-500 text-emerald-400 flex items-center justify-center text-[10px] font-bold flex-shrink-0">
+                  {user.name.charAt(0).toUpperCase()}
+                </div>
+                <div className="flex flex-col min-w-0">
+                  <span className="font-semibold text-white truncate max-w-[140px] leading-tight">
+                    {user.name}
+                  </span>
+                  <span className="text-[10px] text-slate-400 truncate max-w-[140px]">
+                    {user.email}
+                  </span>
+                </div>
+              </div>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                Customer (Buyer)
+              </span>
+            </div>
+          ) : (
+            <div className="px-3.5 py-2 border-b border-slate-800 bg-slate-900/60 flex items-center gap-2">
+              <User className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
+              <input
+                type="text"
+                placeholder="Customer Name"
+                value={customer.name}
+                onChange={(e) => setCustomer({ ...customer, name: e.target.value })}
+                className="w-1/2 px-2 py-1 rounded bg-slate-800 border border-slate-700 text-white text-[11px] focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              />
+              <input
+                type="tel"
+                placeholder="Phone (Optional)"
+                value={customer.phone}
+                onChange={(e) => setCustomer({ ...customer, phone: e.target.value })}
+                className="w-1/2 px-2 py-1 rounded bg-slate-800 border border-slate-700 text-white text-[11px] focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              />
+            </div>
+          )}
 
           {/* Cart Itemized List */}
           <div className="flex-1 overflow-y-auto p-3 space-y-2">
@@ -607,22 +765,52 @@ export default function POSPage() {
               </div>
             )}
 
-            {/* Complete Sale Button */}
-            <button
-              type="button"
-              disabled={items.length === 0 || isCheckingOut}
-              onClick={handleCheckout}
-              className="w-full py-3 rounded-xl font-extrabold text-sm bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-lg shadow-emerald-950/60 transition flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
-            >
-              {isCheckingOut ? (
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              ) : (
-                <>
-                  <CheckCircle2 className="w-4 h-4" />
-                  <span>Complete Checkout ({formatPrice(total)})</span>
-                </>
-              )}
-            </button>
+            {/* Complete Sale Button (Customer-only purchase enforcement) */}
+            {isCustomer ? (
+              <button
+                type="button"
+                disabled={items.length === 0 || isCheckingOut}
+                onClick={handleCheckout}
+                className="w-full py-3 rounded-xl font-extrabold text-sm bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-lg shadow-emerald-950/60 transition flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                {isCheckingOut ? (
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <>
+                    <CheckCircle2 className="w-4 h-4" />
+                    <span>Complete Checkout ({formatPrice(total)})</span>
+                  </>
+                )}
+              </button>
+            ) : isStaff ? (
+              <div className="space-y-1.5">
+                <button
+                  type="button"
+                  disabled
+                  className="w-full py-3 rounded-xl font-bold text-xs bg-rose-950/80 border border-rose-800/80 text-rose-300 shadow-md flex items-center justify-center gap-2 cursor-not-allowed opacity-90"
+                  title="Admin, Cashier, and Manager roles cannot buy products"
+                >
+                  <ShieldAlert className="w-4 h-4 text-rose-400" />
+                  <span>Buying Blocked for {user?.role.toUpperCase()} (Customers Only)</span>
+                </button>
+                <p className="text-[10px] text-center text-rose-400 font-medium">
+                  Admin, Cashier, and Manager accounts cannot buy products in POS.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-1.5">
+                <Link
+                  href="/login"
+                  className="w-full py-3 rounded-xl font-extrabold text-xs bg-sky-600 hover:bg-sky-500 text-white shadow-lg shadow-sky-950/60 transition flex items-center justify-center gap-2"
+                >
+                  <Lock className="w-4 h-4" />
+                  <span>Sign In as Customer to Buy</span>
+                </Link>
+                <p className="text-[10px] text-center text-slate-400">
+                  Only logged-in customers can buy products from the POS terminal.
+                </p>
+              </div>
+            )}
           </div>
         </aside>
       </div>
@@ -691,6 +879,8 @@ export default function POSPage() {
         onClose={() => setCompletedSale(null)}
         sale={completedSale}
       />
+        </div>
+      </div>
     </div>
   );
 }

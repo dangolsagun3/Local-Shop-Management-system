@@ -6,7 +6,6 @@ export interface ProductFilterParams {
   limit?: number;
   search?: string;
   category?: string;
-  brand?: string;
   status?: string;
   low_stock?: boolean | string;
   sortBy?: string;

@@ -2,7 +2,6 @@ import { Router, type Request, type Response } from "express";
 import authRouter from "../module/auth/AuthRoute";
 import userRouter from "../module/user/UserRouter";
 import categoryRouter from "../module/category/CategoryRouter";
-import brandRouter from "../module/brand/BrandRouter";
 import productRouter from "../module/product/ProductRouter";
 import saleRouter from "../module/sale/SaleRouter";
 import dashboardRouter from "../module/dashboard/DashboardRouter";
@@ -42,7 +41,6 @@ router.post("/seed", async (req: Request, res: Response) => {
 router.use("/auth", authRouter);
 router.use("/user", userRouter);
 router.use("/category", categoryRouter);
-router.use("/brand", brandRouter);
 router.use("/product", productRouter);
 router.use("/sale", saleRouter);
 router.use("/dashboard", dashboardRouter);

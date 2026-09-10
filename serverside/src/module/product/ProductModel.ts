@@ -37,12 +37,6 @@ const ProductSchema = new mongoose.Schema({
         required: false,
         default: null
     },
-    brand: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Brand",
-        required: false,
-        default: null
-    },
     costPrice: {
         type: Number,
         required: true,

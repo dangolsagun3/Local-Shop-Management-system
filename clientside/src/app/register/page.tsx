@@ -10,9 +10,6 @@ import {
   Lock,
   Phone,
   MapPin,
-  ShieldCheck,
-  ArrowRight,
-  Sparkles,
   CheckCircle2,
   Database
 } from "lucide-react";
@@ -29,7 +26,7 @@ export default function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
-  const [role, setRole] = useState<"admin" | "seller" | "customer">("seller");
+  const [role, setRole] = useState<"admin" | "seller" | "customer" | "cashier" | "manager">("customer");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -59,9 +56,14 @@ export default function RegisterPage() {
         role
       });
       toast.success("Account created successfully and connected to MongoDB!");
-      router.push("/dashboard");
-    } catch (err: any) {
-      toast.error(err.message || "Registration failed");
+      if (role === "customer") {
+        router.push("/pos");
+      } else {
+        router.push("/dashboard");
+      }
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Registration failed";
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }
@@ -84,12 +86,11 @@ export default function RegisterPage() {
             Create <span className="text-emerald-400">ShopX</span> Account
           </h1>
           <p className="text-xs text-slate-400 mt-1">
-            Register store staff, cashier or shop owner account
+            Register store staff or cashier 
           </p>
 
           <div className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-950/60 border border-emerald-800/40 text-emerald-400 text-[11px] font-medium">
             <Database className="w-3 h-3" />
-            <span>Direct MongoDB Atlas Synchronization</span>
           </div>
         </div>
 
@@ -97,42 +98,65 @@ export default function RegisterPage() {
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Role selector */}
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-              Account Role / Permission Level
-            </label>
-            <div className="grid grid-cols-3 gap-2">
-              <button
-                type="button"
-                onClick={() => setRole("admin")}
-                className={`py-2 px-2 rounded-xl text-xs font-semibold border transition text-center ${
-                  role === "admin"
-                    ? "bg-emerald-600/20 text-emerald-400 border-emerald-500"
-                    : "bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-750"
-                }`}
-              >
-                Owner / Admin
-              </button>
-              <button
-                type="button"
-                onClick={() => setRole("seller")}
-                className={`py-2 px-2 rounded-xl text-xs font-semibold border transition text-center ${
-                  role === "seller"
-                    ? "bg-teal-600/20 text-teal-400 border-teal-500"
-                    : "bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-750"
-                }`}
-              >
-                Cashier / Seller
-              </button>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="text-xs font-semibold text-slate-300">
+                Account Role / Permission Level
+              </label>
+              <span className="text-[10px] text-emerald-400 font-semibold">
+                {role === "customer" ? "✓ Can buy in POS Terminal" : "✕ Cannot buy in POS Terminal"}
+              </span>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               <button
                 type="button"
                 onClick={() => setRole("customer")}
-                className={`py-2 px-2 rounded-xl text-xs font-semibold border transition text-center ${
+                className={`py-2 px-2 rounded-xl text-xs font-bold border transition text-center ${
                   role === "customer"
-                    ? "bg-sky-600/20 text-sky-400 border-sky-500"
+                    ? "bg-emerald-600/25 text-emerald-300 border-emerald-500 shadow-sm"
                     : "bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-750"
                 }`}
               >
                 Customer
+                <span className="block text-[9px] font-normal text-emerald-400">Can buy products</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setRole("seller")}
+                className={`py-2 px-2 rounded-xl text-xs font-bold border transition text-center ${
+                  role === "seller"
+                    ? "bg-teal-600/25 text-teal-300 border-teal-500 shadow-sm"
+                    : "bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-750"
+                }`}
+              >
+                Cashier
+                <span className="block text-[9px] font-normal text-slate-400">Cannot buy</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setRole("manager")}
+                className={`py-2 px-2 rounded-xl text-xs font-bold border transition text-center ${
+                  role === "manager"
+                    ? "bg-amber-600/25 text-amber-300 border-amber-500 shadow-sm"
+                    : "bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-750"
+                }`}
+              >
+                Manager
+                <span className="block text-[9px] font-normal text-slate-400">Cannot buy</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setRole("admin")}
+                className={`py-2 px-2 rounded-xl text-xs font-bold border transition text-center ${
+                  role === "admin"
+                    ? "bg-rose-600/25 text-rose-300 border-rose-500 shadow-sm"
+                    : "bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-750"
+                }`}
+              >
+                Admin
+                <span className="block text-[9px] font-normal text-slate-400">Cannot buy</span>
               </button>
             </div>
           </div>
@@ -163,7 +187,7 @@ export default function RegisterPage() {
                 <input
                   type="email"
                   required
-                  placeholder="ramesh@example.com"
+                  placeholder="YourEmail@gmail.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"

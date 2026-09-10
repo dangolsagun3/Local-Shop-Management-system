@@ -44,7 +44,7 @@ class AuthController{
 
             body.password = bcrypt.hashSync(body.password, 12);
 
-            if (!body.role || !['customer', 'seller', 'admin'].includes(body.role)) {
+            if (!body.role || !['customer', 'seller', 'cashier', 'manager', 'admin'].includes(body.role)) {
                 body.role = 'customer';
             }
 

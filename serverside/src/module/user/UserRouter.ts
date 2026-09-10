@@ -5,8 +5,8 @@ import Auth from "../../middleware/AuthMiddleware";
 const userRouter = Router();
 const userController = new UserController();
 
-userRouter.get("/", Auth(['admin', 'seller']), userController.listAll);
-userRouter.get("/:id", Auth(['admin', 'seller']), userController.getUserById);
+userRouter.get("/", Auth(['admin', 'seller', 'cashier', 'manager']), userController.listAll);
+userRouter.get("/:id", Auth(['admin', 'seller', 'cashier', 'manager']), userController.getUserById);
 userRouter.put("/:id", Auth(['admin']), userController.updateUser);
 userRouter.delete("/:id", Auth(['admin']), userController.deleteUser);
 
