@@ -6,7 +6,7 @@ import {
   Package,
   Upload,
   Sparkles,
-  Barcode,
+  Barcode as BarcodeIcon,
   DollarSign,
   Boxes,
   Tag,
@@ -21,6 +21,7 @@ import { productService } from "../services/productService";
 import { categoryService } from "../services/categoryService";
 import { useSettings } from "../context/SettingsContext";
 import toast from "react-hot-toast";
+import ReactBarcode from "react-barcode";
 
 interface ProductModalProps {
   isOpen: boolean;
@@ -308,16 +309,28 @@ export const ProductModal: React.FC<ProductModalProps> = ({
                     onClick={generateRandomBarcode}
                     className="text-[11px] text-emerald-400 hover:underline flex items-center gap-1"
                   >
-                    <Barcode className="w-3 h-3" /> Auto
+                    <BarcodeIcon className="w-3 h-3" /> Auto
                   </button>
                 </div>
                 <input
                   type="text"
-                  placeholder="8901234567890"
+                  placeholder="890123456789"
                   value={barcode}
                   onChange={(e) => setBarcode(e.target.value)}
                   className="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 />
+                {/^\d{12}$/.test(barcode.trim()) && (
+                  <div className="mt-3 rounded-xl bg-white p-2 flex justify-center overflow-hidden">
+                    <ReactBarcode
+                      value={barcode.trim()}
+                      format="EAN13"
+                      width={1.5}
+                      height={48}
+                      fontSize={11}
+                      margin={2}
+                    />
+                  </div>
+                )}
               </div>
             </div>
           </div>

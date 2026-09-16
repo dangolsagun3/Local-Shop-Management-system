@@ -15,13 +15,13 @@ import {
   CheckCircle2,
   AlertCircle
 } from "lucide-react";
-import { Sidebar } from "../../components/Sidebar";
-import { Navbar } from "../../components/Navbar";
-import { StockAdjustModal } from "../../components/StockAdjustModal";
-import { productService } from "../../services/productService";
-import { dashboardService } from "../../services/dashboardService";
-import { useSettings } from "../../context/SettingsContext";
-import { Product, DashboardStats } from "../../types";
+import { Sidebar } from "../../../components/Sidebar";
+import { Navbar } from "../../../components/Navbar";
+import { StockAdjustModal } from "../../../components/StockAdjustModal";
+import { productService } from "../../../services/productService";
+import { dashboardService } from "../../../services/dashboardService";
+import { useSettings } from "../../../context/SettingsContext";
+import { Product, DashboardStats } from "../../../types";
 import toast from "react-hot-toast";
 
 export default function InventoryPage() {

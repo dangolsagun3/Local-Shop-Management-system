@@ -20,15 +20,15 @@ import {
   ChevronLeft,
   ChevronRight
 } from "lucide-react";
-import { Sidebar } from "../../components/Sidebar";
-import { Navbar } from "../../components/Navbar";
-import { ProductModal } from "../../components/ProductModal";
-import { StockAdjustModal } from "../../components/StockAdjustModal";
-import { DeleteConfirmModal } from "../../components/DeleteConfirmModal";
-import { productService } from "../../services/productService";
-import { categoryService } from "../../services/categoryService";
-import { useSettings } from "../../context/SettingsContext";
-import { Product, Category } from "../../types";
+import { Sidebar } from "../../../components/Sidebar";
+import { Navbar } from "../../../components/Navbar";
+import { ProductModal } from "../../../components/ProductModal";
+import { StockAdjustModal } from "../../../components/StockAdjustModal";
+import { DeleteConfirmModal } from "../../../components/DeleteConfirmModal";
+import { productService } from "../../../services/productService";
+import { categoryService } from "../../../services/categoryService";
+import { useSettings } from "../../../context/SettingsContext";
+import { Product, Category } from "../../../types";
 import toast from "react-hot-toast";
 
 export default function ProductsPage() {

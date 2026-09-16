@@ -33,6 +33,7 @@ export const Sidebar: React.FC<{ lowStockCount?: number }> = ({ lowStockCount = 
   const { user, logout } = useAuth();
   const { settings } = useSettings();
   const [collapsed, setCollapsed] = useState(false);
+  const isCustomer = user?.role === "customer";
 
   const navItems: NavItem[] = [
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -49,6 +50,7 @@ export const Sidebar: React.FC<{ lowStockCount?: number }> = ({ lowStockCount = 
   ];
 
   const filteredNav = navItems.filter((item) => {
+    if (isCustomer) return item.name === "POS Terminal" || item.name === "Categories";
     if (!item.roles) return true;
     if (!user) return false;
     return item.roles.includes(user.role);
@@ -62,7 +64,7 @@ export const Sidebar: React.FC<{ lowStockCount?: number }> = ({ lowStockCount = 
     >
       {/* Header / Logo */}
       <div className="h-16 flex items-center justify-between px-4 border-b border-slate-800">
-        <Link href="/dashboard" className="flex items-center gap-3 overflow-hidden">
+        <Link href={isCustomer ? "/pos" : "/dashboard"} className="flex items-center gap-3 overflow-hidden">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center text-white shadow-lg shadow-emerald-950/50 flex-shrink-0">
             <Store className="w-6 h-6" />
           </div>

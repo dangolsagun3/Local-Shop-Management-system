@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { X, Printer, CheckCircle2, ShoppingBag, Download, Store } from "lucide-react";
+import { X, Printer, CheckCircle2 } from "lucide-react";
 import { Sale } from "../types";
 import { useSettings } from "../context/SettingsContext";
 
@@ -44,10 +44,11 @@ export const ReceiptModal: React.FC<ReceiptModalProps> = ({ isOpen, onClose, sal
             <h1 className="font-extrabold text-base uppercase tracking-wider text-slate-950">
               {settings.shopName}
             </h1>
-            <p className="text-[11px] text-slate-600">{settings.shopAddress}</p>
-            <p className="text-[11px] text-slate-600">
-              Tel: {settings.shopPhone} | {settings.vatNumber}
-            </p>
+            <div className="text-[11px] text-slate-600 space-y-0.5">
+              <p>Address: {settings.shopAddress || "Not configured"}</p>
+              <p>Tel: {settings.shopPhone || "Not configured"}</p>
+              <p>VAT No: {settings.vatNumber || "Not configured"}</p>
+            </div>
             <div className="inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-slate-100 text-slate-800">
               TAX INVOICE / SALES RECEIPT
             </div>
@@ -61,11 +62,14 @@ export const ReceiptModal: React.FC<ReceiptModalProps> = ({ isOpen, onClose, sal
             </div>
             <div className="flex justify-between">
               <span className="text-slate-500">Date & Time:</span>
-              <span>{new Date(sale.createdAt || Date.now()).toLocaleString()}</span>
+              <span>{new Date(sale.createdAt).toLocaleString()}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-slate-500">Cashier:</span>
-              <span>{sale.cashierName || (sale.cashier as any)?.name || "Store Staff"}</span>
+              <span>
+                {sale.cashierName ||
+                  (sale.cashier && "name" in sale.cashier ? sale.cashier.name : "Store Staff")}
+              </span>
             </div>
             {sale.customer?.name && (
               <div className="flex justify-between">

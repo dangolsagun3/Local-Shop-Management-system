@@ -2,12 +2,12 @@
 
 import React, { useState, useEffect } from "react";
 import { Tags, Plus, Edit, Trash2, Search, CheckCircle2 } from "lucide-react";
-import { Sidebar } from "../../components/Sidebar";
-import { Navbar } from "../../components/Navbar";
-import { CategoryModal } from "../../components/CategoryModal";
-import { DeleteConfirmModal } from "../../components/DeleteConfirmModal";
-import { categoryService } from "../../services/categoryService";
-import { Category } from "../../types";
+import { Sidebar } from "../../../components/Sidebar";
+import { Navbar } from "../../../components/Navbar";
+import { CategoryModal } from "../../../components/CategoryModal";
+import { DeleteConfirmModal } from "../../../components/DeleteConfirmModal";
+import { categoryService } from "../../../services/categoryService";
+import { Category } from "../../../types";
 import toast from "react-hot-toast";
 
 export default function CategoriesPage() {

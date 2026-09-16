@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
-import { Navbar } from "../../components/Navbar";
+import { Navbar } from "../../../components/Navbar";
 import {
   ShoppingCart,
   Search,
@@ -29,16 +29,16 @@ import {
   Lock,
   ShieldCheck
 } from "lucide-react";
-import { useAuth } from "../../context/AuthContext";
-import { useSettings } from "../../context/SettingsContext";
-import { useCart } from "../../context/CartContext";
-import { Sidebar } from "../../components/Sidebar";
-import { productService } from "../../services/productService";
-import { categoryService } from "../../services/categoryService";
-import { posService } from "../../services/posService";
-import { Product, Category, Sale } from "../../types";
-import { ReceiptModal } from "../../components/ReceiptModal";
-import { BarcodeScannerModal } from "../../components/BarcodeScannerModal";
+import { useAuth } from "../../../context/AuthContext";
+import { useSettings } from "../../../context/SettingsContext";
+import { useCart } from "../../../context/CartContext";
+import { Sidebar } from "../../../components/Sidebar";
+import { productService } from "../../../services/productService";
+import { categoryService } from "../../../services/categoryService";
+import { posService } from "../../../services/posService";
+import { Product, Category, Sale } from "../../../types";
+import { ReceiptModal } from "../../../components/ReceiptModal";
+import { BarcodeScannerModal } from "../../../components/BarcodeScannerModal";
 import toast from "react-hot-toast";
 
 export default function POSPage() {
@@ -70,6 +70,7 @@ export default function POSPage() {
     recallHeldCart,
     deleteHeldCart
   } = useCart();
+  const isCartActive = items.length > 0;
 
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -415,7 +416,7 @@ export default function POSPage() {
           </div>
 
           {/* Product Cards Grid */}
-          <div className="flex-1 overflow-y-auto p-3 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3 content-start">
+          <div className="flex-1 overflow-y-auto no-scrollbar p-3 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3 content-start">
             {filteredProducts.map((p) => {
               const isOutOfStock = p.stock <= 0;
               const hasDiscount = p.discount > 0;
@@ -499,14 +500,21 @@ export default function POSPage() {
         </section>
 
         {/* RIGHT: Active Checkout Cart Panel */}
-        <aside className="w-80 sm:w-96 flex flex-col bg-slate-900 border-l border-slate-800 flex-shrink-0">
+        <aside
+          className={`w-80 sm:w-96 flex flex-col border-l border-slate-800 flex-shrink-0 transition-colors ${
+            isCartActive ? "bg-slate-900" : "bg-slate-950/70"
+          }`}
+        >
           {/* Cart Header */}
-          <div className="p-3.5 border-b border-slate-800 bg-slate-950/40 flex items-center justify-between">
+          <div className={`p-3.5 border-b border-slate-800 flex items-center justify-between ${isCartActive ? "bg-slate-950/40" : "bg-slate-950/80"}`}>
             <div className="flex items-center gap-2">
-              <ShoppingCart className="w-4 h-4 text-emerald-400" />
+              <ShoppingCart className={`w-4 h-4 ${isCartActive ? "text-emerald-400" : "text-slate-600"}`} />
               <h2 className="text-xs font-bold uppercase tracking-wide text-white">
                 Current Cart ({items.length})
               </h2>
+              <span className={`text-[9px] font-bold uppercase tracking-wide ${isCartActive ? "text-emerald-400" : "text-slate-500"}`}>
+                {isCartActive ? "Active" : "Inactive"}
+              </span>
             </div>
 
             <div className="flex items-center gap-2">
@@ -596,7 +604,7 @@ export default function POSPage() {
           )}
 
           {/* Cart Itemized List */}
-          <div className="flex-1 overflow-y-auto p-3 space-y-2">
+          <div className="flex-1 overflow-y-auto no-scrollbar p-3 space-y-2">
             {items.map((item) => (
               <div
                 key={item.product._id}
@@ -691,11 +699,12 @@ export default function POSPage() {
             <div className="grid grid-cols-4 gap-1 pt-1">
               <button
                 type="button"
+                disabled={!isCartActive}
                 onClick={() => setPaymentMethod("cash")}
                 className={`py-1.5 rounded-lg text-[10px] font-bold border flex flex-col items-center gap-1 transition ${
                   paymentMethod === "cash"
                     ? "bg-emerald-600 text-white border-emerald-500"
-                    : "bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-750"
+                    : "bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-750 disabled:opacity-40 disabled:cursor-not-allowed"
                 }`}
               >
                 <Banknote className="w-3.5 h-3.5" />
@@ -704,11 +713,12 @@ export default function POSPage() {
 
               <button
                 type="button"
+                disabled={!isCartActive}
                 onClick={() => setPaymentMethod("card")}
                 className={`py-1.5 rounded-lg text-[10px] font-bold border flex flex-col items-center gap-1 transition ${
                   paymentMethod === "card"
                     ? "bg-sky-600 text-white border-sky-500"
-                    : "bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-750"
+                    : "bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-750 disabled:opacity-40 disabled:cursor-not-allowed"
                 }`}
               >
                 <CreditCard className="w-3.5 h-3.5" />
@@ -717,11 +727,12 @@ export default function POSPage() {
 
               <button
                 type="button"
+                disabled={!isCartActive}
                 onClick={() => setPaymentMethod("online")}
                 className={`py-1.5 rounded-lg text-[10px] font-bold border flex flex-col items-center gap-1 transition ${
                   paymentMethod === "online"
                     ? "bg-purple-600 text-white border-purple-500"
-                    : "bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-750"
+                    : "bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-750 disabled:opacity-40 disabled:cursor-not-allowed"
                 }`}
               >
                 <Smartphone className="w-3.5 h-3.5" />
@@ -730,11 +741,12 @@ export default function POSPage() {
 
               <button
                 type="button"
+                disabled={!isCartActive}
                 onClick={() => setPaymentMethod("credit")}
                 className={`py-1.5 rounded-lg text-[10px] font-bold border flex flex-col items-center gap-1 transition ${
                   paymentMethod === "credit"
                     ? "bg-amber-600 text-white border-amber-500"
-                    : "bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-750"
+                    : "bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-750 disabled:opacity-40 disabled:cursor-not-allowed"
                 }`}
               >
                 <BookOpen className="w-3.5 h-3.5" />
@@ -749,11 +761,12 @@ export default function POSPage() {
                   <span className="text-slate-400">Cash Received:</span>
                   <input
                     type="number"
+                    disabled={!isCartActive}
                     min="0"
                     placeholder={String(Math.ceil(total))}
                     value={paidAmount || ""}
                     onChange={(e) => setPaidAmount(Number(e.target.value))}
-                    className="w-24 px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-white text-right font-bold focus:outline-none"
+                    className="w-24 px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-white text-right font-bold focus:outline-none disabled:opacity-40 disabled:cursor-not-allowed"
                   />
                 </div>
                 {changeDue > 0 && (
@@ -836,7 +849,7 @@ export default function POSPage() {
                 <X className="w-4 h-4" />
               </button>
             </div>
-            <div className="p-4 space-y-2 max-h-72 overflow-y-auto">
+            <div className="p-4 space-y-2 max-h-72 overflow-y-auto no-scrollbar">
               {heldCarts.map((h) => (
                 <div
                   key={h.id}

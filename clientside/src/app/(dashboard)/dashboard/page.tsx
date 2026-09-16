@@ -20,17 +20,17 @@ import {
   CheckCircle2,
   AlertCircle
 } from "lucide-react";
-import { Sidebar } from "../../components/Sidebar";
-import { Navbar } from "../../components/Navbar";
-import { StatCard } from "../../components/StatCard";
-import { ProductModal } from "../../components/ProductModal";
-import { StockAdjustModal } from "../../components/StockAdjustModal";
-import { ReceiptModal } from "../../components/ReceiptModal";
-import { useAuth } from "../../context/AuthContext";
-import { useSettings } from "../../context/SettingsContext";
-import { dashboardService } from "../../services/dashboardService";
-import { productService } from "../../services/productService";
-import { DashboardStats, ChartDataPoint, Sale, Product } from "../../types";
+import { Sidebar } from "../../../components/Sidebar";
+import { Navbar } from "../../../components/Navbar";
+import { StatCard } from "../../../components/StatCard";
+import { ProductModal } from "../../../components/ProductModal";
+import { StockAdjustModal } from "../../../components/StockAdjustModal";
+import { ReceiptModal } from "../../../components/ReceiptModal";
+import { useAuth } from "../../../context/AuthContext";
+import { useSettings } from "../../../context/SettingsContext";
+import { dashboardService } from "../../../services/dashboardService";
+import { productService } from "../../../services/productService";
+import { DashboardStats, ChartDataPoint, Sale, Product } from "../../../types";
 import {
   AreaChart,
   Area,

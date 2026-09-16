@@ -33,6 +33,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   const { user } = useAuth();
   const { settings } = useSettings();
   const pathname = usePathname();
+  const isCustomer = user?.role === "customer";
   const [currentTime, setCurrentTime] = useState<string>("");
   const [isSeeding, setIsSeeding] = useState<boolean>(false);
 
@@ -95,18 +96,20 @@ export const Navbar: React.FC<NavbarProps> = ({
       {/* Right side actions */}
       <div className="flex items-center gap-2 sm:gap-3">
         {/* Seed Sample Products button */}
-        <button
-          onClick={handleSeed}
-          disabled={isSeeding}
-          className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition"
-          title="Verify or seed store products and categories"
-        >
-          <Sparkles className={`w-3.5 h-3.5 text-amber-400 ${isSeeding ? "animate-spin" : ""}`} />
-          <span>{isSeeding ? "Syncing..." : "Sync Sample Store"}</span>
-        </button>
+        {!isCustomer && (
+          <button
+            onClick={handleSeed}
+            disabled={isSeeding}
+            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition"
+            title="Verify or seed store products and categories"
+          >
+            <Sparkles className={`w-3.5 h-3.5 text-amber-400 ${isSeeding ? "animate-spin" : ""}`} />
+            <span>{isSeeding ? "Syncing..." : "Sync Sample Store"}</span>
+          </button>
+        )}
 
         {/* Add Product Shortcut button */}
-        {onOpenNewProductModal && (
+        {onOpenNewProductModal && !isCustomer && (
           <button
             onClick={onOpenNewProductModal}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white shadow-sm transition"

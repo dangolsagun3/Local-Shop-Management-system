@@ -18,13 +18,13 @@ import {
   ChevronLeft,
   ChevronRight
 } from "lucide-react";
-import { Sidebar } from "../../components/Sidebar";
-import { Navbar } from "../../components/Navbar";
-import { ReceiptModal } from "../../components/ReceiptModal";
-import { DeleteConfirmModal } from "../../components/DeleteConfirmModal";
-import { posService } from "../../services/posService";
-import { useSettings } from "../../context/SettingsContext";
-import { Sale } from "../../types";
+import { Sidebar } from "../../../components/Sidebar";
+import { Navbar } from "../../../components/Navbar";
+import { ReceiptModal } from "../../../components/ReceiptModal";
+import { DeleteConfirmModal } from "../../../components/DeleteConfirmModal";
+import { posService } from "../../../services/posService";
+import { useSettings } from "../../../context/SettingsContext";
+import { Sale } from "../../../types";
 import toast from "react-hot-toast";
 
 export default function SalesPage() {
